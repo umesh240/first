@@ -208,10 +208,22 @@ function localHttpsApplyConfig($apacheExe, $apacheConfFile, $sslConfFile, $sslCo
 		return 'Unable to enable SSL include/modules in: ' . $apacheConfFile;
 	}
 
-	$testCommand = escapeshellarg($apacheExe) . ' -t -f ' . escapeshellarg($apacheConfFile) . ' 2>&1';
-	$testOutput = array();
-	$testCode = 1;
-	exec($testCommand, $testOutput, $testCode);
+	$testCommand = escapeshellarg($apacheExe)
+    . ' -t -f ' . escapeshellarg($apacheConfFile) . ' 2>&1';
+
+error_log('Apache test executable: ' . $apacheExe);
+error_log('Apache test config: ' . $apacheConfFile);
+error_log('Apache test command: ' . $testCommand);
+
+$testOutput = array();
+$testCode = 1;
+
+exec($testCommand, $testOutput, $testCode);
+
+error_log('Apache test exit code: ' . $testCode);
+error_log('Apache test output: ' . implode(PHP_EOL, $testOutput));
+error_log('Configured Apache executable exists: ' . (is_file($apacheExe) ? 'YES' : 'NO'));
+error_log('Configured Apache executable real path: ' . realpath($apacheExe));
 	if ($testCode !== 0) {
 		write_file($sslConfFile, $sslConfBefore);
 		if ($vhostsChanged && $vhostsConfBefore !== null) {
